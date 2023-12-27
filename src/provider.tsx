@@ -6,6 +6,8 @@ import mvp_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?ur
 import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url'
 import eh_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url'
 
+import { load } from './lib/util'
+
 const Context = createContext({ db: null } as { db: duckdb.AsyncDuckDB | null })
 
 export default function Provider({ children }: { children: React.ReactNode }) {
@@ -27,17 +29,10 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
         await db.instantiate(bundle.mainModule, bundle.pthreadWorker)
 
-        const res = await fetch('/data/vo2max.parquet')
-        await db.registerFileBuffer(
-          'buffer.parquet',
-          new Uint8Array(await res.arrayBuffer())
-        )
-        const conn = await db.connect()
-
-        await conn.query(
-          `CREATE TABLE vo2max AS SELECT * FROM 'buffer.parquet';`
-        )
-        conn.close()
+        Promise.all([
+          load(db, 'data/bodymass.parquet', 'bodymass'),
+          load(db, 'data/vo2max.parquet', 'vo2max'),
+        ])
 
         setDb(() => db)
       } catch (e) {

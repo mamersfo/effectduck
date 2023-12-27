@@ -37,7 +37,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
         tickSize: 1,
         tickPadding: 1,
         tickRotation: 0,
-        legend: 'vo2max',
+        legend: 'value',
         legendOffset: -40,
         legendPosition: 'middle',
       }}
