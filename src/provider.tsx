@@ -32,6 +32,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
         Promise.all([
           load(db, 'data/bodymass.parquet', 'bodymass'),
           load(db, 'data/vo2max.parquet', 'vo2max'),
+          load(db, 'data/distance.parquet', 'distance'),
         ])
 
         setDb(() => db)

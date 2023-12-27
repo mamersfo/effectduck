@@ -6,6 +6,7 @@ import { readTable } from './lib/util'
 function App() {
   const [vo2max, setVo2max] = useState<any>()
   const [bodyMass, setBodyMass] = useState<any>()
+  const [distance, setDistance] = useState<any>()
   const [data, setData] = useState<any[]>([])
 
   const { db } = useDb()
@@ -36,6 +37,19 @@ function App() {
     setData([data])
   }
 
+  const loadDistance = async () => {
+    let data
+
+    if (distance) {
+      data = distance
+    } else {
+      data = await readTable(db!, 'distance', 'hsl(252, 21%, 58%)')
+      setDistance(data)
+    }
+
+    setData([data])
+  }
+
   return (
     <div className='p-8 prose'>
       <h1>EffectDuck</h1>
@@ -45,6 +59,9 @@ function App() {
         </button>
         <button className='btn' onClick={loadBodyMass}>
           bodyMass
+        </button>
+        <button className='btn' onClick={loadDistance}>
+          distance
         </button>
       </div>
       {data && (

@@ -9,7 +9,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{
         type: 'time',
-        min: new Date(2022, 0, 1),
+        min: new Date(2022, 3, 1),
         max: new Date(2024, 0, 1),
       }}
       yScale={{
@@ -20,7 +20,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
         reverse: false,
       }}
       yFormat=' >-.2f'
-      curve='basis'
+      curve='natural'
       axisTop={null}
       axisRight={null}
       axisBottom={{
