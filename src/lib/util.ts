@@ -26,7 +26,10 @@ export const load = async (
 
   await conn.query(`
     create table ${table} as 
-    select * from 'buffer.${table}.parquet'
+    select 
+      date, 
+      value 
+    from 'buffer.${table}.parquet'
     where date >= '2022-04-01'
   `)
 
@@ -40,7 +43,7 @@ export const readTable = async (
 ) => {
   const conn = await db.connect()
 
-  const res = await conn?.query(`SELECT date, value FROM ${id} order by date;`)
+  const res = await conn?.query(`SELECT * FROM ${id}`)
 
   const data = arrowToJson(res).map((d: any) => ({
     x: parseISO(d.date),

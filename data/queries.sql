@@ -2,69 +2,51 @@
 
 drop table vo2max;
 
-create table
-    vo2max as
-select
-    startdate as date,
+create table vo2max as 
+select 
+    time_bucket ( interval '1 month', cast("startdate" as date)) as date, 
     avg(value) as value
-from
-    read_csv_auto ('health/HKQuantityTypeIdentifierVO2Max.csv', dateformat = '%Y-%m-%d %H:%M:%S %z', header = true)
-group by
-    startdate
-order by
-    startdate;
+from read_csv_auto(
+    'data/health/HKQuantityTypeIdentifierVO2Max.csv'
+)
+group by date
+order by date;
 
-select
-    *
-from
-    vo2max;
+select * from vo2max;
 
-copy vo2max to 'vo2max.parquet' (format parquet);
+copy vo2max to 'data/vo2max.parquet' (format parquet);
 
 -- bodymass
 
 drop table bodymass;
 
-create table
-    bodymass as
-select
-    startdate as date,
+create table bodymass as 
+select 
+    time_bucket ( interval '1 day', cast("startdate" as date)) as date, 
     avg(value) as value
-from
-    read_csv_auto ('health/HKQuantityTypeIdentifierBodyMass.csv', dateformat = '%Y-%m-%d %H:%M:%S %z', header = true)
-where
-    sourcename = 'Withings'
-group by
-    startdate
-order by
-    startdate;
+from read_csv_auto(
+    'data/health/HKQuantityTypeIdentifierBodyMass.csv'
+)
+where sourcename = 'Withings'
+group by date 
+order by date;
 
-select
-    *
-from
-    bodymass;
+select * from bodymass;
 
-copy bodymass to 'bodymass.parquet' (format parquet);
+copy bodymass to 'data/bodymass.parquet' (format parquet);
 
--- distance
+--- distance
 
 drop table distance;
 
-create table
-    distance as
-select
-    strftime (startdate, '%Y-%m-01') as date,
+create table distance as 
+select 
+    time_bucket ( interval '1 month', cast("startdate" as date)) as date, 
     sum(value) as value
-from
-    read_csv_auto ('health/HKQuantityTypeIdentifierDistanceWalkingRunning.csv', dateformat = '%Y-%m-%d %H:%M:%S %z', header = true)
-group by
-    date
-order by
-    date;
+from read_csv_auto(
+    'data/health/HKQuantityTypeIdentifierDistanceWalkingRunning.csv'
+)
+group by date 
+order by date;
 
-select
-    *
-from
-    distance;
-
-copy distance to 'distance.parquet' (format parquet);
+copy distance to 'data/distance.parquet' (format parquet);
