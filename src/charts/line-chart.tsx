@@ -1,6 +1,6 @@
 import { ResponsiveLine } from '@nivo/line'
 
-export const LineChart = ({ data }: { data: any[] }) => {
+export const LineChart = ({ data, unit }: { data: any[]; unit?: string }) => {
   if (!data || data.length === 0) return <></>
 
   return (
@@ -9,7 +9,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{
         type: 'time',
-        min: new Date(2022, 3, 1),
+        min: new Date(2022, 0, 1),
         max: new Date(2024, 0, 1),
       }}
       yScale={{
@@ -37,7 +37,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
         tickSize: 1,
         tickPadding: 1,
         tickRotation: 0,
-        legend: 'value',
+        legend: unit || 'value',
         legendOffset: -40,
         legendPosition: 'middle',
       }}
@@ -49,7 +49,7 @@ export const LineChart = ({ data }: { data: any[] }) => {
       useMesh={true}
       legends={[
         {
-          anchor: 'bottom-right',
+          anchor: 'top-left',
           direction: 'column',
           justify: false,
           translateX: 100,

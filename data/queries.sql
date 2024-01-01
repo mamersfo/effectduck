@@ -4,10 +4,16 @@ drop table vo2max;
 
 create table vo2max as 
 select 
-    time_bucket ( interval '1 month', cast("startdate" as date)) as date, 
+    cast ( time_bucket ( interval '1 month', startDate ) as date) as date, 
     avg(value) as value
-from read_csv_auto(
-    'data/health/HKQuantityTypeIdentifierVO2Max.csv'
+from read_csv(
+    'apple_health_export/HKQuantityTypeIdentifierVO2Max.csv',
+    delim=";",
+    header=false,
+    columns={
+        startDate: 'TIMESTAMPTZ',
+        value: 'FLOAT'
+    }
 )
 group by date
 order by date;
@@ -22,16 +28,20 @@ drop table bodymass;
 
 create table bodymass as 
 select 
-    time_bucket ( interval '1 day', cast("startdate" as date)) as date, 
+    cast ( time_bucket ( interval '1 day', startDate) as date) as date, 
     avg(value) as value
-from read_csv_auto(
-    'data/health/HKQuantityTypeIdentifierBodyMass.csv'
+from read_csv(
+    'data/csv/HKQuantityTypeIdentifierBodyMass.csv',
+    delim=";",
+    header=false,
+    columns={
+        sourceName: 'VARCHAR',
+        startDate: 'TIMESTAMPTZ',
+        value: 'FLOAT'
+    }
 )
-where sourcename = 'Withings'
 group by date 
 order by date;
-
-select * from bodymass;
 
 copy bodymass to 'data/bodymass.parquet' (format parquet);
 
@@ -41,12 +51,31 @@ drop table distance;
 
 create table distance as 
 select 
-    time_bucket ( interval '1 month', cast("startdate" as date)) as date, 
+    cast ( time_bucket ( interval '1 month', startDate) as date) as date, 
     sum(value) as value
-from read_csv_auto(
-    'data/health/HKQuantityTypeIdentifierDistanceWalkingRunning.csv'
+from read_csv(
+    'apple_health_export/HKQuantityTypeIdentifierDistanceWalkingRunning.csv',
+    delim=";",
+    header=false,
+    columns={
+        sourceName: 'VARCHAR',
+        startDate: 'TIMESTAMPTZ',
+        value: 'FLOAT'
+    }
 )
 group by date 
 order by date;
 
 copy distance to 'data/distance.parquet' (format parquet);
+
+
+
+copy ( select 
+sourceName as source, 
+cast ( time_bucket ( interval '1 day', startDate) as date) as date, 
+avg(value) as value 
+from read_csv( 
+    'data/csv/WalkingStepLength.csv', delim='|', header=false, 
+    columns={ sourceName: 'VARCHAR', startDate: 'TIMESTAMPTZ', value: 'FLOAT' }) 
+group by source, date 
+order by date ) to 'data/parquet/WalkingStepLength.parquet' (format parquet);

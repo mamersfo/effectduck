@@ -7,6 +7,7 @@ import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url'
 import eh_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url'
 
 import { load } from './lib/util'
+import { quantifiers } from './types'
 
 const Context = createContext({ db: null } as { db: duckdb.AsyncDuckDB | null })
 
@@ -29,11 +30,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
         await db.instantiate(bundle.mainModule, bundle.pthreadWorker)
 
-        Promise.all([
-          load(db, 'data/bodymass.parquet', 'bodymass'),
-          load(db, 'data/vo2max.parquet', 'vo2max'),
-          load(db, 'data/distance.parquet', 'distance'),
-        ])
+        Promise.all(quantifiers.map((q) => load(db, q)))
 
         setDb(() => db)
       } catch (e) {
